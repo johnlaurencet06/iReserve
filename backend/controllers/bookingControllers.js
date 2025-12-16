@@ -2,21 +2,21 @@ const Booking = require('../models/bookingModel')
 const Room = require('../models/roomModel')
 const mongoose = require('mongoose')
 
-const now = () => new Date()
+const now = () => new Date() //new Date() = current date & time () after => means it’s a function. This function returns the current time
 
 const isAlignedTo30Min = (d) => {
 	if (!(d instanceof Date)) return false
 	return (d.getMinutes() % 30 === 0) && d.getSeconds() === 0 && d.getMilliseconds() === 0
 }
 
-// check overlapping bookings 
+// check overlapping bookings. Find bookings in the SAME ROOM where:start time ≤ new end time end time ≥ new start time That’s how overlapping time is detected
 const hasOverlap = async (roomId, start, end, excludeId = null) => {
 	const query = {
 		room: roomId,
 		startTime: { $lte: end },
 		endTime: { $gte: start }
 	}
-	if (excludeId) query._id = { $ne: excludeId }
+	if (excludeId) query._id = { $ne: excludeId } //findOne() = find one matching record !! converts result into true or false
 	const overlapping = await Booking.findOne(query)
 	return !!overlapping
 }
